@@ -1,0 +1,101 @@
+#:kivy 2.3.1
+
+<TodoItem>:
+    size_hint_y: None
+    height: 50
+    padding: 10
+    spacing: 10
+    
+    CheckBox:
+        size_hint_x: None
+        width: 40
+        active: root.done
+        on_active: app.root.toggle_done(root.todo_id, root.done)
+    
+    Label:
+        text: root.title
+        text_size: self.size
+        halign: 'left'
+        valign: 'middle'
+        strikethrough: root.done
+        color: (0.5, 0.5, 0.5, 1) if root.done else (1, 1, 1, 1)
+    
+    Button:
+        text: 'Delete'
+        size_hint_x: None
+        width: 80
+        background_color: (0.8, 0.2, 0.2, 1)
+        on_press: app.root.confirm_delete(root.todo_id, root.title)
+
+<TodoView>:
+    orientation: 'vertical'
+    padding: 20
+    spacing: 10
+    
+    # Header
+    BoxLayout:
+        size_hint_y: None
+        height: 60
+        spacing: 10
+        
+        Label:
+            text: 'Todo App'
+            font_size: '24sp'
+            bold: True
+            size_hint_x: 0.7
+        
+        Button:
+            text: 'Refresh'
+            size_hint_x: 0.3
+            on_press: root.refresh_todos()
+    
+    # Input area
+    BoxLayout:
+        size_hint_y: None
+        height: 50
+        spacing: 10
+        
+        TextInput:
+            id: input_title
+            hint_text: 'Enter todo title...'
+            multiline: False
+            on_text_validate: root.add_todo()
+        
+        Button:
+            text: 'Add'
+            size_hint_x: None
+            width: 100
+            background_color: (0.2, 0.7, 0.3, 1)
+            on_press: root.add_todo()
+    
+    # Loading indicator
+    Label:
+        text: 'Loading...' if root.loading else ''
+        size_hint_y: None
+        height: 30 if root.loading else 0
+        opacity: 1 if root.loading else 0
+    
+    # Separator
+    Widget:
+        size_hint_y: None
+        height: 1
+        canvas:
+            Color:
+                rgba: 0.5, 0.5, 0.5, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+    
+    # Todo list
+    ScrollView:
+        do_scroll_x: False
+        
+        GridLayout:
+            id: todos_container
+            cols: 1
+            spacing: 5
+            padding: 5
+            size_hint_y: None
+            height: self.minimum_height
+            
+            # Dynamic todo items will be added here
